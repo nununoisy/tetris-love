@@ -46,3 +46,9 @@ This still needs some more stuff, like:
 - [ ] More SFX/music
 
 ... and there's probably more stuff missing.
+
+## Credits
+
++ kikito for [love-loader](https://github.com/kikito/love-loader)
++ itraykov for [profile.lua](https://bitbucket.org/itraykov/profile.lua/) (used during development)
++ MIDIArchive.co.uk for the original [Korobeiniki MIDI file](https://midiarchive.co.uk/midi/Games/Tetris)
