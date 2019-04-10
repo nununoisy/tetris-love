@@ -16,10 +16,10 @@ I designed this game to figure out how Guideline Tetris worked.
 
 ## How to play
 
-First, [download Love2D](https://love2d.org).
+1. First, [download Love2D](https://love2d.org). 
+tetris-love is built on Love 11.2, but does work with versions 0.9.1 and up.
 
-Clone the repository.
-
+2. Clone the repository.
 You can use the Download as ZIP button above. Then rename the extension from `.zip` to `.love`.
 
 **OR**
@@ -29,7 +29,7 @@ From the command line:
 git clone https://github.com/nununoisy/tetris-love
 ```
 
-Now launch Love2D - either drag `tetris-love.love` onto `love.exe` or execute `love /path/to/tetris-love`
+3. Now launch Love2D - either drag `tetris-love.love` onto `love.exe` or execute `love /path/to/tetris-love`
 
 ## Themes
 

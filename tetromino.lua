@@ -108,6 +108,7 @@ function tetromino.commitToGrid(shape, x, y, rot, grid)
 end
 
 function tetromino.canExistAs(shape, x, y, rot, grid)
+    if not shape then return false end
     local tetriminoData = tetriminoes[shape][rot + 1] -- because Lua is 1-indexed, hooray!!
     for i=1,5 do
         for j=0,4 do

@@ -10,30 +10,47 @@
     6: Game over
     7: High-scores
 ]]
+local loader
+if (love._version_major == 0 and (love._version_minor < 9 or (love._version_minor == 9 and love._version_revision == 0))) or not love.getVersion then
+    gamemode = -1
+    love.getVersion = function()
+        return (love._version_major or 0), (love._version_minor or 7), (love._version_revision or 0), ""
+    end
+    love.window = {}
+    love.window.setMode = function(a,b)
+    end
+    love.window.setTitle = function(title)
+    end
+    love.joystick = {}
+    love.joystick.getJoystickCount = function()
+        return 0
+    end
+    loader = false
+else
+    -- desktop
+    ---[[
+    loader = require 'love-loader'
+    --]]
 
--- desktop
----[[
-local loader = require 'love-loader'
---]]
-
--- web
---[[
-local loader = {}
-function loader.newImage(container, name, path)
-    container[name] = love.graphics.newImage(path)
+    -- web
+    --[[
+    local loader = {}
+    function loader.newImage(container, name, path)
+        container[name] = love.graphics.newImage(path)
+    end
+    function loader.newSource(container, name, path)
+        container[name] = love.audio.newSource(path, "static")
+    end
+    function loader.start(cb)
+        cb()
+    end
+    function loader.update()
+        loader.loadedCount = 1
+    end
+    loader.loadedCount = 0
+    loader.resourceCount = 1
+    --]]
 end
-function loader.newSource(container, name, path)
-    container[name] = love.audio.newSource(path, "static")
-end
-function loader.start(cb)
-    cb()
-end
-function loader.update()
-    loader.loadedCount = 1
-end
-loader.loadedCount = 0
-loader.resourceCount = 1
---]]
 local tetromino = require 'tetromino'
 local ui = require 'ui'
 local gfxopts = require 'gfxopts'
@@ -56,7 +73,7 @@ function love.window.getDPIScale()
 end
 --]]
 
-local major, minor = love.getVersion()
+local major, minor, revision, codename = love.getVersion()
 
 if major < 11 then
     love.window.getDPIScale = function()
@@ -176,6 +193,8 @@ local function saveStats()
 end
 
 function love.load(arg)
+
+    if not loader then return end
 
     if love.joystick.getJoystickCount() > 0 then
         joystick = love.joystick.getJoysticks()[1]
@@ -538,7 +557,7 @@ function love.update(dt)
     end
     --]]
     if gamemode == 0 then
-        loader.update()
+        if loader then loader.update() end
     elseif gamemode == 1 then
         if sounds.korobeiniki:isPlaying() then
             sounds.korobeiniki:stop()
@@ -581,12 +600,15 @@ function love.update(dt)
             awardTimer = awardTimer - dt
             if awardTimer < 0 then awardTimer = 0 end
         end
-        if lineCount ~= 0 then
+        if #linesToClear > 0 then
+            print("t="..lineClearTimer)
+            print("c="..lineCount)
             lineClearTimer = lineClearTimer - (4 * dt)
             if lineClearTimer < 0 then 
                 lineClearTimer = 1
                 linesToClear = {}
                 lineCount = 0
+                print("---------")
             end
             return
         end
@@ -870,7 +892,7 @@ function love.keyreleased(key)
             didSRS = changeRotState(1)
         elseif (key == "rctrl" or key == "lctrl" or key == "z") and not paused then
             didSRS = changeRotState(-1)
-        elseif key == "space" and not paused then
+        elseif (key == "space" or key == " ") and not paused then
             hardDrop()
         elseif (key == "c" or key == "lshift" or key == "rshift") and not paused then
             useHold()
@@ -917,8 +939,13 @@ end
 
 function love.draw()
     if gamemode == -1 then
-        
+        love.graphics.print("You are using an unsupported version of Love (".. (minor == 7 and "< 0.8.0" or  (major .. "." .. minor .. "." .. revision)) .. ").", 10, 10)
+        love.graphics.print("Please update to at least 0.9.1.", 10, 30)
     elseif gamemode == 0 or gamemode == 1 then
+        if not loader then
+            gamemode = -1
+            return
+        end
         if legalTimer <= 0.5 then
             gfxopts.sColor(1,1,1,legalTimer * 2)  -- / 0.5
         end
@@ -929,13 +956,17 @@ function love.draw()
         gfxopts.gPrint("Licensed to the Tetris Company. Game design by Alexey Pajitnov.", 10, 110)
         gfxopts.gPrint("This game is not endorsed by or affiliated with the Tetris Company.", 10, 135)
         gfxopts.gPrint("tetris-love Game Code is © 2018 Noah Sweilem.", 10, 160)
+        if major < 11 then
+            gfxopts.gPrint("You are using Love " .. major .. "." .. minor .. "." .. revision .. " (" .. codename .. ").", 10, 300)
+            gfxopts.gPrint("tetris-love works best on at least 11.0.0 (Mysterious Mysteries).", 10, 325)
+        end
         if gamemode == 0 then
             --
             gfxopts.gPrint("Loading... " .. math.floor(loader.loadedCount / loader.resourceCount * 100) .. "%", 10, 190)
             gfxopts.gRect("line", 10, 220, 780, 50)
             gfxopts.gRect("fill", 15, 225, (770 * (loader.loadedCount / loader.resourceCount)), 40)
         else
-            gfxopts.sColor(1,1,1,(legalTimer - 1.5) / 1.5)
+            gfxopts.sColor(1,1,1,(legalTimer > 1.5 and (legalTimer - 1.5) / 1.5) or 0)
             gfxopts.gPrint("Done!", 10, 190)
             gfxopts.gRect("line", 10, 220, 780, 50)
             gfxopts.gRect("fill", 15, 225, 770, 40)
