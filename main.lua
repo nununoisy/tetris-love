@@ -36,6 +36,8 @@ loader.resourceCount = 1
 --]]
 local tetromino = require 'tetromino'
 local ui = require 'ui'
+local gfxopts = require 'gfxopts'
+
 local profile = false
 
 --local gDraw = love.graphics.draw
@@ -61,47 +63,6 @@ if major < 11 then
         return 1
     end
     love.filesystem.getInfo = love.filesystem.exists
-end
-
-local function gDraw(drawable, x, y, r, sx, sy, ox, oy, kx, ky)
-    local a, b, c = love.graphics.draw, love.window.toPixels, love.window.getDPIScale
-    local r = r or 0    local sx = sx or 1
-    local sy = sx or 1
-    local ox = ox or 0
-    local oy = ox or 0
-    local kx = kx or 0
-    local ky = ky or 0
-    a(drawable, b(x), b(y), r, sx * c(), sy * c(), b(ox), b(oy), b(kx), b(ky))
-end
---local sColor = love.graphics.setColor
-local function sColor(r,g,b,a)
-    local aa = love.graphics.setColor
-    if major >= 11 then
-        aa(r,g,b,a)
-    else
-        aa(r*255,g*255,b*255,a)
-    end
-end
-
---local gRect = love.graphics.rectangle
-
-local function gRect(mode, x, y, width, height)
-    local a, b = love.graphics.rectangle, love.window.toPixels
-    a(mode, b(x), b(y), b(width), b(height))
-end
-
--- local gPrint = love.graphics.print
-
-local function gPrint(text, x, y, r, sx, sy, ox, oy, kx, ky)
-    local a, b, c = love.graphics.print, love.window.toPixels, love.window.getDPIScale
-    local r = r or 0
-    local sx = sx or 1
-    local sy = sx or 1
-    local ox = ox or 0
-    local oy = ox or 0
-    local kx = kx or 0
-    local ky = ky or 0
-    a(text, b(x), b(y), r, sx, sy, b(ox), b(oy), b(kx), b(ky))
 end
 
 local tDrawMino = tetromino.drawMino
@@ -325,6 +286,8 @@ local timerCeiling = 0
 local lineCount = 0
 local linesToClear = {}
 local lineClearTimer = 1
+local allClearFlag = false
+local allClearTimer = 0
 local linesToLevelUp = 5
 local levelUp = 0
 local holdAvailable = true
@@ -627,6 +590,10 @@ function love.update(dt)
             end
             return
         end
+        if allClearTimer > 0 then
+            allClearTimer = allClearTimer - dt
+            if allClearTimer < 0 then allClearTimer = 0 end
+        end
         if joystickExists then
             doMovementJS(dt)
         else
@@ -675,6 +642,12 @@ function love.update(dt)
                     end
                 elseif subGame == 2 then
                     ultraLines = ultraLines + math.floor(awards[award] * (backToBack == true and 1.5 or 1))
+                end
+                if tetromino.didAllClear(grid) and lineCount > 0 then
+                    allClearTimer = 3
+                    allClearFlag = false
+                else
+                    allClearFlag = true
                 end
                 linesToClear = {}
                 willHardDrop = false
@@ -821,6 +794,7 @@ function love.mousereleased(uix, uiy, button, isTouch)
         lineCount = 0
         linesToClear = {}
         lineClearTimer = 1
+        allClearTimer = 0
         linesToLevelUp = 5
         levelUp = 0
         holdAvailable = true
@@ -946,27 +920,27 @@ function love.draw()
         
     elseif gamemode == 0 or gamemode == 1 then
         if legalTimer <= 0.5 then
-            sColor(1,1,1,legalTimer * 2)  -- / 0.5
+            gfxopts.sColor(1,1,1,legalTimer * 2)  -- / 0.5
         end
-        gPrint("Tetris ® and © 1985-2018 Tetris Holding.", 10, 10)
-        gPrint("Tetris logos, Tetris theme song and Tetriminos are", 10, 35)
-        gPrint("trademarks of Tetris Holding.", 10, 60)
-        gPrint("The Tetris trade dress is owned by Tetris Holding.", 10, 85)
-        gPrint("Licensed to the Tetris Company. Game design by Alexey Pajitnov.", 10, 110)
-        gPrint("This game is not endorsed by or affiliated with the Tetris Company.", 10, 135)
-        gPrint("tetris-love Game Code is © 2018 Noah Sweilem.", 10, 160)
+        gfxopts.gPrint("Tetris ® and © 1985-2018 Tetris Holding.", 10, 10)
+        gfxopts.gPrint("Tetris logos, Tetris theme song and Tetriminos are", 10, 35)
+        gfxopts.gPrint("trademarks of Tetris Holding.", 10, 60)
+        gfxopts.gPrint("The Tetris trade dress is owned by Tetris Holding.", 10, 85)
+        gfxopts.gPrint("Licensed to the Tetris Company. Game design by Alexey Pajitnov.", 10, 110)
+        gfxopts.gPrint("This game is not endorsed by or affiliated with the Tetris Company.", 10, 135)
+        gfxopts.gPrint("tetris-love Game Code is © 2018 Noah Sweilem.", 10, 160)
         if gamemode == 0 then
             --
-            gPrint("Loading... " .. math.floor(loader.loadedCount / loader.resourceCount * 100) .. "%", 10, 190)
-            gRect("line", 10, 220, 780, 50)
-            gRect("fill", 15, 225, (770 * (loader.loadedCount / loader.resourceCount)), 40)
+            gfxopts.gPrint("Loading... " .. math.floor(loader.loadedCount / loader.resourceCount * 100) .. "%", 10, 190)
+            gfxopts.gRect("line", 10, 220, 780, 50)
+            gfxopts.gRect("fill", 15, 225, (770 * (loader.loadedCount / loader.resourceCount)), 40)
         else
-            sColor(1,1,1,(legalTimer - 1.5) / 1.5)
-            gPrint("Done!", 10, 190)
-            gRect("line", 10, 220, 780, 50)
-            gRect("fill", 15, 225, 770, 40)
+            gfxopts.sColor(1,1,1,(legalTimer - 1.5) / 1.5)
+            gfxopts.gPrint("Done!", 10, 190)
+            gfxopts.gRect("line", 10, 220, 780, 50)
+            gfxopts.gRect("fill", 15, 225, 770, 40)
         end
-        sColor(1,1,1,1)
+        gfxopts.sColor(1,1,1,1)
     elseif gamemode == 2 then
         ui.draw.mainMenu(titleTimer)
     elseif gamemode == 3 then
@@ -974,7 +948,7 @@ function love.draw()
     elseif gamemode == 4 then
         ui.draw.levelSelect(level, subGame)
     elseif gamemode == 5 then
-        gDraw(images.background, 0, 0)
+        gfxopts.gDraw(images.background, 0, 0)
         if not paused and countdown == 0 then
             
             if curTetromino ~= 0 and not animLockFlag then
@@ -985,13 +959,13 @@ function love.draw()
             for i = 1, 10 do
                 for j = 1, 20 do
                     if grid[i][j] ~= 0 then
-                        gDraw(indexedMinos[grid[i][j]], (198 + ((i - 1) * 32)), (((20 - j) * 32) + 30), 0, 0.5, 0.5)
+                        gfxopts.gDraw(indexedMinos[grid[i][j]], (198 + ((i - 1) * 32)), (((20 - j) * 32) + 30), 0, 0.5, 0.5)
                     end
                     if linesToClear ~= {} then
                         if contains(linesToClear, j) then
-                            gRect("fill", 198, (((20 - j) * 32) + 30), (320 * math.sin((1 - lineClearTimer) * 0.5 * math.pi)), 32)
+                            gfxopts.gRect("fill", 198, (((20 - j) * 32) + 30), (320 * math.sin((1 - lineClearTimer) * 0.5 * math.pi)), 32)
                             if lineCount == 4 then
-                                gDraw(images.sparkles, (198 + (320 * math.sin((1 - lineClearTimer) * 0.5 * math.pi))), (((20 - j) * 32) + 30), 0, 0.5, 0.5)
+                                gfxopts.gDraw(images.sparkles, (198 + (320 * math.sin((1 - lineClearTimer) * 0.5 * math.pi))), (((20 - j) * 32) + 30), 0, 0.5, 0.5)
                             end
                         end
                     end
@@ -1015,40 +989,54 @@ function love.draw()
             end
         end
         if indexedAwardGfx[dAward] ~= nil and awardTimer > 0 then
-            gDraw(indexedAwardGfx[dAward], 0, 540, 0, 0.49, 0.49)
+            gfxopts.gDraw(indexedAwardGfx[dAward], 0, 540, 0, 0.49, 0.49)
         end
-        gPrint("Score: " .. score, 5, 300)
+        if allClearTimer > 0 then
+            if allClearTimer < 1 then
+                gfxopts.gRect("fill", 198 + (320 * math.sin((1 - allClearTimer) * 0.5 * math.pi)), 90, 320 - (320 * math.sin((1 - allClearTimer) * 0.5 * math.pi)), 50)
+            elseif allClearTimer >= 1 and allClearTimer < 2 then
+                gfxopts.gRect("fill", 198, 90, 320, 50)
+                gfxopts.sColor(0,0,0,1)
+                love.graphics.setFont(bigFont)
+                gfxopts.gPrint("All Clear", 260, 95)
+                love.graphics.setFont(font)
+                gfxopts.sColor(1,1,1,1)
+            else
+                gfxopts.gRect("fill", 198, 90, (320 * math.sin((1 - (allClearTimer - 2)) * 0.5 * math.pi)), 50)
+            end
+        end
+        gfxopts.gPrint("Score: " .. score, 5, 300)
         if subGame == 0 then
-            sColor(generateLevelColor(level))
-            gRect("fill", 3, 328, 150, 25)
-            sColor(1,1,1,1)
-            gPrint("Level " .. level, 5, 330)
-            gPrint("Goal: " .. linesToLevelUp, 5, 360)
+            gfxopts.sColor(generateLevelColor(level))
+            gfxopts.gRect("fill", 3, 328, 150, 25)
+            gfxopts.sColor(1,1,1,1)
+            gfxopts.gPrint("Level " .. level, 5, 330)
+            gfxopts.gPrint("Goal: " .. linesToLevelUp, 5, 360)
         elseif subGame == 1 then
-            gPrint("Goal: " .. sprintLines, 5, 330)
-            gPrint("Time: " .. getTimer(sprintTimer), 5, 360)
+            gfxopts.gPrint("Goal: " .. sprintLines, 5, 330)
+            gfxopts.gPrint("Time: " .. getTimer(sprintTimer), 5, 360)
         elseif subGame == 2 then
-            gPrint("Lines: " .. ultraLines, 5, 330)
-            gPrint("Time: " .. getTimer(ultraTimer), 5, 360)
+            gfxopts.gPrint("Lines: " .. ultraLines, 5, 330)
+            gfxopts.gPrint("Time: " .. getTimer(ultraTimer), 5, 360)
         end
-        gPrint((backToBack == true and 'Back-to-Back ' or ''), 0, 510)
+        gfxopts.gPrint((backToBack == true and 'Back-to-Back ' or ''), 0, 510)
         if levelUp > 0 then
             love.graphics.setFont(bigFont)
-            gPrint("Level Up", 300, 330)
+            gfxopts.gPrint("Level Up", 300, 330)
             love.graphics.setFont(font)
         end
         if paused == true then
             ui.draw.paused()
         end
         if countdown > 0 then
-            sColor(0.5,0.5,0.5,0.7)
-            gRect("fill", 0, 0, 800, 700)
+            gfxopts.sColor(0.5,0.5,0.5,0.7)
+            gfxopts.gRect("fill", 0, 0, 800, 700)
             local wave = math.sin(math.pi * (countdown - math.floor(countdown)))
-            sColor(1,1,1,wave)
+            gfxopts.sColor(1,1,1,wave)
             love.graphics.setFont(bigFont)
-            gPrint(math.ceil(countdown), 450 - (200 * (countdown - math.floor(countdown))), 330)
+            gfxopts.gPrint(math.ceil(countdown), 450 - (200 * (countdown - math.floor(countdown))), 330)
             love.graphics.setFont(font)
-            sColor(1,1,1,1)
+            gfxopts.sColor(1,1,1,1)
         end
     elseif gamemode == 6 then
         if gameOver then

@@ -4,30 +4,8 @@ tetromino.lua
 Contains functions for the Tetrimino Bag generator and draws Tetriminos
 ]]
 
-local function gDraw(drawable, x, y, r, sx, sy, ox, oy, kx, ky)
-    local a, b, c = love.graphics.draw, love.window.toPixels, love.window.getDPIScale
-    local r = r or 0
-    local sx = sx or 1
-    local sy = sx or 1
-    local ox = ox or 0
-    local oy = ox or 0
-    local kx = kx or 0
-    local ky = ky or 0
-    a(drawable, b(x), b(y), r, sx * c(), sy * c(), b(ox), b(oy), b(kx), b(ky))
-end
-local function gRect(mode, x, y, width, height)
-    local a, b = love.graphics.rectangle, love.window.toPixels
-    a(mode, b(x), b(y), b(width), b(height))
-end
-local function sColor(r,g,b,a)
-    local major = love.getVersion()
-    local aa = love.graphics.setColor
-    if major >= 11 then
-        aa(r,g,b,a)
-    else
-        aa(r*255,g*255,b*255,a)
-    end
-end
+local gfxopts = require 'gfxopts'
+
 local floor = math.floor
 
 local tetromino = {}
@@ -104,10 +82,10 @@ function tetromino.drawMino(shape, image, x, y, rot, fade)
             local n = bitoper(tetriminoData[i], 2^j)
             if n ~= 0 then
                 if fade == true then
-                    sColor(1,1,1,1)
-                    gRect("fill", (x + ((i-1) * 32)), (y + ((4-j) * 32)), 32, 32)
+                    gfxopts.sColor(1,1,1,1)
+                    gfxopts.gRect("fill", (x + ((i-1) * 32)), (y + ((4-j) * 32)), 32, 32)
                 else
-                    gDraw(image, (x + ((i-1) * 32)), (y + ((4-j) * 32)), 0, 0.5, 0.5)
+                    gfxopts.gDraw(image, (x + ((i-1) * 32)), (y + ((4-j) * 32)), 0, 0.5, 0.5)
                 end
             end
         end
@@ -163,16 +141,16 @@ function tetromino.drawGhost(shape, image, gx, y, rot, grid)
     local gy = tetromino.getLowestValidPosition(shape, gx, y, rot, grid)
     if gy == y then return end
     local tetriminoData = tetriminoes[shape][rot + 1] -- because Lua is 1-indexed, hooray!!
-    sColor(1,1,1,0.4)
+    gfxopts.sColor(1,1,1,0.4)
     for i=1,5 do
         for j=0,4 do
             local n = bitoper(tetriminoData[i], 2^j)
             if n ~= 0 then
-                gDraw(image, 102 + (32 * (gx + (i-1))), (32 * (25-gy-j)) - 66, 0, 0.5, 0.5)
+                gfxopts.gDraw(image, 102 + (32 * (gx + (i-1))), (32 * (25-gy-j)) - 66, 0, 0.5, 0.5)
             end
         end
     end
-    sColor(1,1,1,1)
+    gfxopts.sColor(1,1,1,1)
 end
 
 function tetromino.drawHardDropBlur(shape, image, x, y, rot, grid)
@@ -182,14 +160,14 @@ function tetromino.drawHardDropBlur(shape, image, x, y, rot, grid)
         for j=0,4 do
             local n = bitoper(tetriminoData[i], 2^j)
             if n ~= 0 then
-                sColor(1,1,1,0.3)
-                gDraw(image, 102 + (32 * (x + (i-1))), (32 * (25-y-j)) - 66, 0, 0.5, 0.5)
-                sColor(1,1,1,0.6)
-                gDraw(image, 102 + (32 * (x + (i-1))), (32 * (25-iy-j)) - 66, 0, 0.5, 0.5)
+                gfxopts.sColor(1,1,1,0.3)
+                gfxopts.gDraw(image, 102 + (32 * (x + (i-1))), (32 * (25-y-j)) - 66, 0, 0.5, 0.5)
+                gfxopts.sColor(1,1,1,0.6)
+                gfxopts.gDraw(image, 102 + (32 * (x + (i-1))), (32 * (25-iy-j)) - 66, 0, 0.5, 0.5)
             end
         end
     end
-    sColor(1,1,1,1)
+    gfxopts.sColor(1,1,1,1)
 end
 
 otSpinA = {{-1,1},{1,1},{1,-1},{-1,-1}}

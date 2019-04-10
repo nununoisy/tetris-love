@@ -8,41 +8,7 @@ local ui = {}
 ui.draw = {}
 ui.mouse = {}
 
-local function gDraw(drawable, x, y, r, sx, sy, ox, oy, kx, ky)
-    local a, b, c = love.graphics.draw, love.window.toPixels, love.window.getDPIScale
-    local r = r or 0
-    local sx = sx or 1
-    local sy = sx or 1
-    local ox = ox or 0
-    local oy = ox or 0
-    local kx = kx or 0
-    local ky = ky or 0
-    a(drawable, b(x), b(y), r, sx * c(), sy * c(), b(ox), b(oy), b(kx), b(ky))
-end
-local function sColor(r,g,b,a)
-    local major = love.getVersion()
-    local aa = love.graphics.setColor
-    if major >= 11 then
-        aa(r,g,b,a)
-    else
-        aa(r*255,g*255,b*255,a)
-    end
-end
-local function gRect(mode, x, y, width, height)
-    local a, b = love.graphics.rectangle, love.window.toPixels
-    a(mode, b(x), b(y), b(width), b(height))
-end
-local function gPrint(text, x, y, r, sx, sy, ox, oy, kx, ky)
-    local a, b, c = love.graphics.print, love.window.toPixels, love.window.getDPIScale
-    local r = r or 0
-    local sx = sx or 1
-    local sy = sx or 1
-    local ox = ox or 0
-    local oy = ox or 0
-    local kx = kx or 0
-    local ky = ky or 0
-    a(text, b(x), b(y), r, sx, sy, b(ox), b(oy), b(kx), b(ky))
-end
+local gfxopts = require 'gfxopts'
 
 local images = {}
 
@@ -96,16 +62,16 @@ local function generateLevelColor(level)
 end
 
 function ui.draw.mainMenu(titleTimer)
-    sColor(1,1,1,titleTimer / 5)
-    gDraw(images.backgroundMenu, 0, 0, 0)
-    gDraw(images.tetrislogo, 250, 50 * math.sin(math.pi * titleTimer * 0.1), 0, 0.2, 0.2)
-    sColor((24/255),(211/255),(21/255),1)
-    gRect("fill", 250, 300, 300, 50)
-    sColor((153/255),0,1,1)
-    gRect("fill", 250, 400, 300, 50)
-    sColor(1,1,1,1)
-    gPrint("Play", 375, 315)
-    gPrint("Statistics", 325, 415)
+    gfxopts.sColor(1,1,1,titleTimer / 5)
+    gfxopts.gDraw(images.backgroundMenu, 0, 0, 0)
+    gfxopts.gDraw(images.tetrislogo, 250, 50 * math.sin(math.pi * titleTimer * 0.1), 0, 0.2, 0.2)
+    gfxopts.sColor((24/255),(211/255),(21/255),1)
+    gfxopts.gRect("fill", 250, 300, 300, 50)
+    gfxopts.sColor((153/255),0,1,1)
+    gfxopts.gRect("fill", 250, 400, 300, 50)
+    gfxopts.sColor(1,1,1,1)
+    gfxopts.gPrint("Play", 375, 315)
+    gfxopts.gPrint("Statistics", 325, 415)
 end
 
 function ui.mouse.mainMenu(uix, uiy, button, isTouch, titleTimer)
@@ -125,18 +91,18 @@ function ui.mouse.mainMenu(uix, uiy, button, isTouch, titleTimer)
 end
 
 function ui.draw.gameSelect()
-    gDraw(images.backgroundMenu, 0, 0)
-    sColor(1,(153/255),0,1)
-    gRect("fill", 250, 200, 300, 50)
-    sColor(0,(190/255),0,1)
-    gRect("fill", 250, 400, 300, 50)
-    sColor(0.7,0,0.7,1)
-    gRect("fill", 250, 600, 300, 50)
-    sColor(1,1,1,1)
-    gPrint("Marathon", 375, 215)
-    gPrint("Sprint", 375, 415)
-    gPrint("Ultra", 375, 615)
-    gDraw(images.back, 5, 5, 0, 0.5, 0.5)
+    gfxopts.gDraw(images.backgroundMenu, 0, 0)
+    gfxopts.sColor(1,(153/255),0,1)
+    gfxopts.gRect("fill", 250, 200, 300, 50)
+    gfxopts.sColor(0,(190/255),0,1)
+    gfxopts.gRect("fill", 250, 400, 300, 50)
+    gfxopts.sColor(0.7,0,0.7,1)
+    gfxopts.gRect("fill", 250, 600, 300, 50)
+    gfxopts.sColor(1,1,1,1)
+    gfxopts.gPrint("Marathon", 375, 215)
+    gfxopts.gPrint("Sprint", 375, 415)
+    gfxopts.gPrint("Ultra", 375, 615)
+    gfxopts.gDraw(images.back, 5, 5, 0, 0.5, 0.5)
 end
 
 function ui.mouse.gameSelect(uix, uiy, button, isTouch)
@@ -161,21 +127,21 @@ function ui.mouse.gameSelect(uix, uiy, button, isTouch)
 end
 
 function ui.draw.levelSelect(level, subgame)
-    gDraw(images.backgroundMenu, 0, 0)
-    sColor(0,0,1,1)
-    gRect("fill", 250, 500, 300, 50)
+    gfxopts.gDraw(images.backgroundMenu, 0, 0)
+    gfxopts.sColor(0,0,1,1)
+    gfxopts.gRect("fill", 250, 500, 300, 50)
     if subgame == 0 then
-        sColor(generateLevelColor(level))
-        gRect("fill", 375, 325, 50, 50)
-        sColor(1,1,1,1)
-        gPrint(level, (level < 10 and 393 or 383), 335)
-        gPrint("<", 350, 345)
-        gPrint(">", 435, 345)
+        gfxopts.sColor(generateLevelColor(level))
+        gfxopts.gRect("fill", 375, 325, 50, 50)
+        gfxopts.sColor(1,1,1,1)
+        gfxopts.gPrint(level, (level < 10 and 393 or 383), 335)
+        gfxopts.gPrint("<", 350, 345)
+        gfxopts.gPrint(">", 435, 345)
     else
-        sColor(1,1,1,1)
+        gfxopts.sColor(1,1,1,1)
     end
-    gDraw(images.back, 5, 5, 0, 0.5, 0.5)
-    gPrint("Play", 375, 515)
+    gfxopts.gDraw(images.back, 5, 5, 0, 0.5, 0.5)
+    gfxopts.gPrint("Play", 375, 515)
 end
 
 function ui.mouse.levelSelect(uix, uiy, button, isTouch, level)
@@ -201,36 +167,36 @@ function ui.mouse.levelSelect(uix, uiy, button, isTouch, level)
 end
 
 function ui.draw.stats(tstats, stats, subgame)
-    gDraw(images.backgroundMenu, 0, 0)
-    gDraw(images.back, 5, 5, 0, 0.5, 0.5)
-    sColor(0.5,0.5,0.5,0.5)
-    gRect("fill", 250, 90, 350, 500)
-    sColor(1,1,1,1)
+    gfxopts.gDraw(images.backgroundMenu, 0, 0)
+    gfxopts.gDraw(images.back, 5, 5, 0, 0.5, 0.5)
+    gfxopts.sColor(0.5,0.5,0.5,0.5)
+    gfxopts.gRect("fill", 250, 90, 350, 500)
+    gfxopts.sColor(1,1,1,1)
     love.graphics.setFont(bigFont)
-    gPrint("Game Over", 320, 200)
-    gPrint("High Score", 315, 450)
+    gfxopts.gPrint("Game Over", 320, 200)
+    gfxopts.gPrint("High Score", 315, 450)
     love.graphics.setFont(font)
     if subgame == 0 then
-        sColor(generateLevelColor(tstats.level))
-        gRect("fill", 295, 295, 210, 30)
-        sColor(1,1,1,1)
-        gPrint("Level: " .. tstats.level, 300, 300)
+        gfxopts.sColor(generateLevelColor(tstats.level))
+        gfxopts.gRect("fill", 295, 295, 210, 30)
+        gfxopts.sColor(1,1,1,1)
+        gfxopts.gPrint("Level: " .. tstats.level, 300, 300)
     end
-    gPrint("Score: " .. tstats.score, 300, 330)
+    gfxopts.gPrint("Score: " .. tstats.score, 300, 330)
     if subgame == 0 then
-        gPrint("Time: " .. getTimer(tstats.time), 300, 360)
-        gPrint("Lines: " .. tstats.lines, 300, 390)
+        gfxopts.gPrint("Time: " .. getTimer(tstats.time), 300, 360)
+        gfxopts.gPrint("Lines: " .. tstats.lines, 300, 390)
     elseif subgame == 1 then
-        gPrint("Time: " .. getTimer(tstats.time), 300, 360)
+        gfxopts.gPrint("Time: " .. getTimer(tstats.time), 300, 360)
     elseif subgame == 2 then
-        gPrint("Lines: " .. tstats.lines, 300, 360)
+        gfxopts.gPrint("Lines: " .. tstats.lines, 300, 360)
     end
     if subgame == 0 then
-        gPrint(stats.marathon.score, 300, 500)
+        gfxopts.gPrint(stats.marathon.score, 300, 500)
     elseif subgame == 1 then
-        gPrint(stats.sprint.score, 300, 500)
+        gfxopts.gPrint(stats.sprint.score, 300, 500)
     elseif subgame == 2 then
-        gPrint(stats.ultra.score, 300, 500)
+        gfxopts.gPrint(stats.ultra.score, 300, 500)
     end
 end
 
@@ -244,17 +210,17 @@ function ui.mouse.stats(uix, uiy, button, isTouch)
 end
 
 function ui.draw.paused()
-    sColor(0.5,0.5,0.5,0.7)
-    gRect("fill", 0, 0, 800, 700)
-    sColor(0,(190/255),0,1)
-    gRect("fill", 250, 400, 300, 50)
-    sColor(0.9,0.1,0.1,1)
-    gRect("fill", 250, 500, 300, 50)
-    sColor(1,1,1,1)
-    gPrint("Resume", 375, 415)
-    gPrint("Quit", 375, 515)
+    gfxopts.sColor(0.5,0.5,0.5,0.7)
+    gfxopts.gRect("fill", 0, 0, 800, 700)
+    gfxopts.sColor(0,(190/255),0,1)
+    gfxopts.gRect("fill", 250, 400, 300, 50)
+    gfxopts.sColor(0.9,0.1,0.1,1)
+    gfxopts.gRect("fill", 250, 500, 300, 50)
+    gfxopts.sColor(1,1,1,1)
+    gfxopts.gPrint("Resume", 375, 415)
+    gfxopts.gPrint("Quit", 375, 515)
     love.graphics.setFont(bigFont)
-    gPrint("Paused", 300, 330)
+    gfxopts.gPrint("Paused", 300, 330)
     love.graphics.setFont(font)
 end
 
@@ -288,20 +254,20 @@ local awardStrings = {
 }
 
 function ui.draw.statsAllTime(stats)
-    gDraw(images.backgroundMenu, 0, 0)
-    gDraw(images.back, 5, 5, 0, 0.5, 0.5)
-    sColor(0.5,0.5,0.5,0.5)
-    gRect("fill", 250, 90, 350, 500)
-    sColor(1,1,1,1)
+    gfxopts.gDraw(images.backgroundMenu, 0, 0)
+    gfxopts.gDraw(images.back, 5, 5, 0, 0.5, 0.5)
+    gfxopts.sColor(0.5,0.5,0.5,0.5)
+    gfxopts.gRect("fill", 250, 90, 350, 500)
+    gfxopts.sColor(1,1,1,1)
     love.graphics.setFont(bigFont)
-    gPrint("Statistics", 300, 100)
+    gfxopts.gPrint("Statistics", 300, 100)
     love.graphics.setFont(font)
-    gPrint("High Score: " .. stats.score, 275, 150)
-    gPrint("Lines: " .. stats.lines, 275, 180)
-    gPrint("Duration: " .. getLongTimer(stats.duration), 275, 210)
-    gPrint("Awards:", 275, 240)
+    gfxopts.gPrint("High Score: " .. stats.score, 275, 150)
+    gfxopts.gPrint("Lines: " .. stats.lines, 275, 180)
+    gfxopts.gPrint("Duration: " .. getLongTimer(stats.duration), 275, 210)
+    gfxopts.gPrint("Awards:", 275, 240)
     for k=2,11 do
-        gPrint(awardStrings[k] .. ": " .. stats.awardCounts[k], 300, 210 + (k * 30)) -- 210 = 270 - (2 * 30)
+        gfxopts.gPrint(awardStrings[k] .. ": " .. stats.awardCounts[k], 300, 210 + (k * 30)) -- 210 = 270 - (2 * 30)
     end
 end
 
