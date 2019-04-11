@@ -54,4 +54,4 @@ This still needs some more stuff, like:
 + itraykov for [profile.lua](https://bitbucket.org/itraykov/profile.lua/) (used during development)
 + MIDIArchive.co.uk for the original [Korobeiniki MIDI file](https://midiarchive.co.uk/midi/Games/Tetris)
 
-[logo]: https://github.com/adam-p/markdown-here/raw/master/images/tetris-love-logo.png "tetris-love"
+[logo]: https://github.com/nununoisy/tetris-love/raw/master/images/tetris-love-logo.png "tetris-love"
