@@ -196,7 +196,7 @@ function love.load(arg)
 
     if not loader then return end
 
-    love.window.setIcon(love.graphics.newImage("images/tetris-love-logo.png"))
+    love.window.setIcon(love.image.newImageData("images/tetris-love-logo.png"))
 
     if love.joystick.getJoystickCount() > 0 then
         joystick = love.joystick.getJoysticks()[1]
