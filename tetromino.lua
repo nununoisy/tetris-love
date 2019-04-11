@@ -264,7 +264,8 @@ function tetromino.attemptSRS(shape, x, y, rot, nrot, grid, willLock, attemptCou
                 tSpin = 0
             end
             willLock = false
-            if (y + SRSdy) == tetromino.getLowestValidPosition(shape, x + SRSdx, y + SRSdy, nrot, grid) then
+            print(attemptCount)
+            if (y + SRSdy) == tetromino.getLowestValidPosition(shape, x + SRSdx, y + SRSdy, nrot, grid) or attemptCount < 15 then
                 attemptCount = attemptCount - 1
                 if attemptCount == 0 then
                     willLock = true

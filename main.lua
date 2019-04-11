@@ -603,14 +603,11 @@ function love.update(dt)
             if awardTimer < 0 then awardTimer = 0 end
         end
         if #linesToClear > 0 then
-            print("t="..lineClearTimer)
-            print("c="..lineCount)
             lineClearTimer = lineClearTimer - (4 * dt)
             if lineClearTimer < 0 then 
                 lineClearTimer = 1
                 linesToClear = {}
                 lineCount = 0
-                print("---------")
             end
             return
         end
@@ -742,7 +739,7 @@ function love.update(dt)
                         return
                     end
                 else
-                    if curPosY ~= tetromino.getLowestValidPosition(curTetromino, curPosX, curPosY, curRotState, grid) then
+                    if curPosY ~= tetromino.getLowestValidPosition(curTetromino, curPosX, curPosY, curRotState, grid) and SRSlockCounter ~= 0 then
                         willLock = false
                         timerCeiling = (0.8 - ((level - 1) * 0.007))^(level-1)
                         return
@@ -846,7 +843,6 @@ function love.mousereleased(uix, uiy, button, isTouch)
     elseif gamemode == 6 then
         gamemode = ui.mouse.stats(uix, uiy, button, isTouch)
     elseif gamemode == 7 then
-        
         gamemode = ui.mouse.statsAllTime(uix, uiy, button, isTouch)
     end
 end

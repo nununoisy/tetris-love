@@ -41,7 +41,7 @@ You are free to replace the graphics contained within the `images/` subdirectory
 Please maintain the code style. PRs are welcome.
 
 This still needs some more stuff, like:
-- [ ] 15-rotation limit for SRS on the ground
+- [X] 15-rotation limit for SRS on the ground
 - [ ] Directions/control layout
 - [ ] Button remapping
 - [ ] More SFX/music
