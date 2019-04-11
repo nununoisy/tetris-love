@@ -1,4 +1,5 @@
 # tetris-love
+ ![tetris-love logo][logo]
 
 Guideline Tetris for Love2D
 
@@ -52,3 +53,5 @@ This still needs some more stuff, like:
 + kikito for [love-loader](https://github.com/kikito/love-loader)
 + itraykov for [profile.lua](https://bitbucket.org/itraykov/profile.lua/) (used during development)
 + MIDIArchive.co.uk for the original [Korobeiniki MIDI file](https://midiarchive.co.uk/midi/Games/Tetris)
+
+[logo]: https://github.com/adam-p/markdown-here/raw/master/images/tetris-love-logo.png "tetris-love"
