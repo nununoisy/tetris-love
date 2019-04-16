@@ -338,7 +338,7 @@ local sprintTimer = 0
 local sprintLines = 0
 local ultraLines = 0
 local ultraTimer = 0
-local shouldRestart = false
+shouldRestart = false
 
 --[[
 local awardStrings = {
