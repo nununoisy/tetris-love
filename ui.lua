@@ -168,7 +168,7 @@ function ui.mouse.levelSelect(uix, uiy, button, isTouch, level)
     if (uix >= 5 and uix <= 50) and (uiy >= 5 and uiy <= 25) then
         gamemode = 3
     end
-    if (uix >= 250 and uix <= 550) and (uiy >= 500 and uiy <= 550) then
+    if (uix >= 250 and uix <= 550) and (uiy >= 500 and uiy <= 550) or shouldRestart then
         gamemode = 5
         countdown = 3
     end
@@ -232,10 +232,13 @@ function ui.draw.paused()
     gfxopts.sColor(0,(190/255),0,1)
     gfxopts.gRect("fill", 250, 400, 300, 50)
     gfxopts.sColor(0.9,0.1,0.1,1)
+    gfxopts.gRect("fill", 250, 600, 300, 50)
+    gfxopts.sColor(1,(153/255),0,1)
     gfxopts.gRect("fill", 250, 500, 300, 50)
     gfxopts.sColor(1,1,1,1)
     gfxopts.gPrint("Resume", 375, 415)
-    gfxopts.gPrint("Quit", 375, 515)
+    gfxopts.gPrint("Restart", 375, 515)
+    gfxopts.gPrint("Quit", 375, 615)
     love.graphics.setFont(bigFont)
     gfxopts.gPrint("Paused", 300, 330)
     love.graphics.setFont(font)
@@ -245,15 +248,20 @@ function ui.mouse.paused(uix, uiy, button, isTouch)
     local gamemode = 5
     local paused = true
     local countdown = 0
+    local shouldRestart = false
     local uix, uiy = love.window.fromPixels(uix), love.window.fromPixels(uiy)
     if (uix >= 250 and uix <= 550) and (uiy >= 400 and uiy <= 450) then
         paused = false
         countdown = 3
     end
     if (uix >= 250 and uix <= 550) and (uiy >= 500 and uiy <= 550) then
+        shouldRestart = true
+        gamemode = 4
+    end
+    if (uix >= 250 and uix <= 550) and (uiy >= 600 and uiy <= 650) then
         gamemode = 2
     end
-    return gamemode, paused, countdown
+    return gamemode, paused, countdown, shouldRestart
 end
 
 local awardStrings = {

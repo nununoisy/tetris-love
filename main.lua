@@ -11,7 +11,7 @@
     7: High-scores
 ]]
 local loader
-if (love._version_major == 0 and (love._version_minor < 9 or (love._version_minor == 9 and love._version_revision == 0))) or not love.getVersion then
+if (love._version_major == 0 and (love._version_minor < 9 or (love._version_minor == 9 and love._version_revision ~= 2))) or not love.getVersion then
     gamemode = -1
     love.getVersion = function()
         return (love._version_major or 0), (love._version_minor or 7), (love._version_revision or 0), ""
@@ -230,6 +230,7 @@ function love.load(arg)
     loader.newImage(images, 'jmino', 'images/newminos/jmino.png')
     loader.newImage(images, 'smino', 'images/newminos/smino.png')
     loader.newImage(images, 'zmino', 'images/newminos/zmino.png')
+    loader.newImage(images, 'garbage', 'images/newminos/garbage.png')
     loader.newImage(images, 'awdouble', 'images/double.png')
     loader.newImage(images, 'awtriple', 'images/triple.png')
     loader.newImage(images, 'awtetris', 'images/tetrisAward.png')
@@ -318,6 +319,7 @@ local award = 1
 local dAward = 0
 local previousAward = 1
 local backToBack = false
+local comboCounter = -1
 local awardTimer = 0
 local score = 0
 local softDrop = false
@@ -336,6 +338,7 @@ local sprintTimer = 0
 local sprintLines = 0
 local ultraLines = 0
 local ultraTimer = 0
+local shouldRestart = false
 
 --[[
 local awardStrings = {
@@ -451,7 +454,6 @@ local function changeXPos(offset)
 end
 
 local function doMovement(dt)
-    
     if love.keyboard.isDown("left") then
         if slideSpeed == 0 then
             changeXPos(-1)
@@ -574,6 +576,8 @@ function love.update(dt)
         if titleTimer >= 5 then titleTimer = 5 end
     elseif gamemode == 3 then
         titleTimer = 5
+    elseif gamemode == 4 and shouldRestart then
+        love.mousereleased(0,0,"left",false)
     elseif gamemode == 5 then
         if not sounds.korobeiniki:isPlaying() and not paused and countdown == 0 then
             sounds.korobeiniki:play()
@@ -663,6 +667,11 @@ function love.update(dt)
                     end
                 elseif subGame == 2 then
                     ultraLines = ultraLines + math.floor(awards[award] * (backToBack == true and 1.5 or 1))
+                end
+                if lineCount > 0 then
+                    comboCounter = comboCounter + 1
+                else
+                    comboCounter = -1
                 end
                 if tetromino.didAllClear(grid) and lineCount > 0 then
                     allClearTimer = 3
@@ -787,7 +796,7 @@ function love.mousereleased(uix, uiy, button, isTouch)
         level = 1
         gamemode, subGame = ui.mouse.gameSelect(uix, uiy, button, isTouch)
     elseif gamemode == 4 then
-        gamemode, level, countdown = ui.mouse.levelSelect(uix, uiy, button, isTouch, level, subGame)
+        gamemode, level, countdown = ui.mouse.levelSelect(uix, uiy, button, isTouch, level, subGame, shouldRestart)
         if subGame == 0 then
             linesToLevelUp = level * 5
         elseif subGame == 1 then
@@ -831,6 +840,7 @@ function love.mousereleased(uix, uiy, button, isTouch)
         isAnimating = false
         animLockFlag = false
         paused = false
+        comboCounter = -1
         for i = 1, 10 do
             grid[i] = {}
     
@@ -838,8 +848,14 @@ function love.mousereleased(uix, uiy, button, isTouch)
                 grid[i][j] = 0 -- Fill the values here
             end
         end
+        if shouldRestart then
+            shouldRestart = false
+        end
     elseif gamemode == 5 and paused then
-        gamemode, paused, countdown = ui.mouse.paused(uix, uiy, button, isTouch)
+        gamemode, paused, countdown, shouldRestart = ui.mouse.paused(uix, uiy, button, isTouch)
+        if shouldRestart then
+            print("restart")
+        end
     elseif gamemode == 6 then
         gamemode = ui.mouse.stats(uix, uiy, button, isTouch)
     elseif gamemode == 7 then
@@ -1048,6 +1064,7 @@ function love.draw()
             gfxopts.gPrint("Lines: " .. ultraLines, 5, 330)
             gfxopts.gPrint("Time: " .. getTimer(ultraTimer), 5, 360)
         end
+        gfxopts.gPrint((comboCounter > 0 and comboCounter .. ' Combo' or ''), 0, 480)
         gfxopts.gPrint((backToBack == true and 'Back-to-Back ' or ''), 0, 510)
         if levelUp > 0 then
             love.graphics.setFont(bigFont)
