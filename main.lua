@@ -849,6 +849,7 @@ function love.mousereleased(uix, uiy, button, isTouch)
             end
         end
         if shouldRestart then
+            level = 1
             shouldRestart = false
         end
     elseif gamemode == 5 and paused then
